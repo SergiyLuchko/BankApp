@@ -77,3 +77,20 @@ const displayMovements = function (movements) {
 };
 
 displayMovements(account1.movements);
+const calcDisplayBallance = function(movements){
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance.toFixed(2)} EUR`;
+}
+calcDisplayBallance(account1.movements)
+const createUserNames = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner;
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(word => word[0])
+      .join('');
+  });
+};
+createUserNames(accounts);
+
