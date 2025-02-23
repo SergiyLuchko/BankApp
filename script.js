@@ -76,12 +76,11 @@ const displayMovements = function (movements) {
   });
 };
 
+const calcDisplayBallance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
 
-const calcDisplayBallance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance.toFixed(2)} €`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)} €`;
 };
-
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
@@ -114,6 +113,15 @@ const createUserNames = function (accs) {
 };
 createUserNames(accounts);
 
+const updateUI = function (acc) {
+  //!Display Movements
+  displayMovements(acc.movements);
+  // !Display balance
+  calcDisplayBallance(acc);
+  // !Display summary
+  calcDisplaySummary(acc);
+};
+
 // *Event handlers
 let currentAccount;
 
@@ -129,15 +137,33 @@ btnLogin.addEventListener('click', function (e) {
       currentAccount.owner.split(' ')[0]
     }`;
     containerApp.style.opacity = 100;
-// ! Clear input fields
+    // ! Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
-    //!Display Movements
-    displayMovements(currentAccount.movements);
-    // !Display balance
-    calcDisplayBallance(currentAccount.movements);
-    // !Display summary
-    calcDisplaySummary(currentAccount);
+    updateUI(currentAccount);
   }
+});
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+  console.log(amount, receiverAcc);
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc?.username !== currentAccount.username
+  ) {
+    // ! Doing the transfer
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+    // ! Update UI
+    updateUI(currentAccount);
+  }
+  inputTransferAmount.value = inputTransferTo.value = '';
+  inputTransferAmount.blur();
 });
